@@ -1,6 +1,10 @@
 ---
 name: "NPM Cache Action"
+author: "Nicolas Merget"
 description: "Initialize node version & NPM cache"
+branding:
+  icon: package
+  color: gray-dark
 inputs:
   nodeModulesPath:
     description: "Path for node_modules"
