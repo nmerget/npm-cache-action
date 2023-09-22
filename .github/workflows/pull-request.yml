@@ -1,0 +1,35 @@
+name: On Pull Request
+
+on: pull_request
+
+permissions:
+  pull-requests: write
+  contents: write
+  actions: read
+  security-events: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - name: ⬇ Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1.6.0
+        with:
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+
+      - name: 🤖 Enable auto-merge for Dependabot PRs
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+  labeler:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏷️ Labeler
+        uses: actions/labeler@v4
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          sync-labels: true

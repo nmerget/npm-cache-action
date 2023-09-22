@@ -1,0 +1,43 @@
+---
+name: "NPM Cache Action"
+description: "Initialize node version & NPM cache"
+inputs:
+  nodeModulesPath:
+    description: "Path for node_modules"
+    required: false
+    default: "**/node_modules"
+  packageLockPath:
+    description: "Path for package-lock.json"
+    required: false
+    default: "**/package-lock.json"
+  nodeVersion:
+    description: "Node version"
+    required: false
+    default: "18"
+runs:
+  using: "composite"
+  steps:
+    - name: 🆙 Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.nodeVersion }}
+
+    - name: 🔛 Display node and npm version
+      shell: bash
+      run: |
+        node --version
+        npm --version
+
+    - name: 🆒 Init Cache
+      uses: actions/cache@v3
+      id: "cache"
+      with:
+        path: ${{ inputs.nodeModulesPath }}
+        key: ${{ runner.os }}-node-${{ inputs.nodeVersion }}-${{ hashFiles(inputs.packageLockPath) }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ inputs.nodeVersion }}
+
+    - name: ⏬ NPM ci
+      shell: bash
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: npm ci
